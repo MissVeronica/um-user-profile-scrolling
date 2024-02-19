@@ -4,13 +4,14 @@ Extension to Ultimate Member for User Profile Scrolling via ID, username, displa
 ## UM Settings -> Appearance -> Profile
 1. User Profile Scrolling - meta_key - Select the meta_key for User Profile Scrolling.
 2. User Profile Scrolling - Form IDs - Enter the Profile Form IDs comma separated for User Profile Scrolling.
-3. User Profile Scrolling - Random - Click to add Random display of User Profiles
+3. User Profile Scrolling - Random - Click to add Random display of User Profiles.
+4. User Profile Scrolling - Page bottom - Click to display buttons at the Profile page bottom.
 
 ## Metakeys supported
 ID, user_login, display_name, first_name, last_name, user_nicename, user_email  
 
 ## Updates
-None
+1. Version 0.9.1 Removed buttons when Profile edit. Added option to display buttons at Page bottom.
 
 ## Translations or Text changes
 1. Use the "Say What?" plugin with text domain ultimate-member
