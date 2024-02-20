@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - User Profile Scrolling
  * Description:     Extension to Ultimate Member for User Profile Scrolling via ID, username, display name, first or last name, user email or random.
- * Version:         0.9.1 beta
+ * Version:         1.0.0
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -10,7 +10,7 @@
  * Author URI:      https://github.com/MissVeronica
  * Text Domain:     ultimate-member
  * Domain Path:     /languages
- * UM version:      2.8.2
+ * UM version:      2.8.3
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; 
@@ -144,45 +144,48 @@ Class UM_User_Profile_Scrolling {
 
     public function um_settings_structure_user_scroll( $settings_structure ) {
 
-        $settings_structure['appearance']['sections']['']['fields'][] =
+        $settings_structure['appearance']['sections']['']['form_sections']['user_profile_scrolling']['title'] = __( 'User Profile Scrolling', 'ultimate-member' );
+        $settings_structure['appearance']['sections']['']['form_sections']['user_profile_scrolling']['description'] = __( 'Plugin version 1.0.0 - tested with UM 2.8.3', 'ultimate-member' );
+
+        $settings_structure['appearance']['sections']['']['form_sections']['user_profile_scrolling']['fields'][] =
 
                 array(
                     'id'            => 'um_user_profile_scrolling_meta_key',
                     'type'          => 'select',
                     'size'          => 'small',
                     'options'       => $this->user_scroll_options,
-                    'label'         => __( 'User Profile Scrolling - meta_key', 'ultimate-member' ),
-                    'tooltip'       => __( 'Select the meta_key for User Profile Scrolling.', 'ultimate-member' )
+                    'label'         => __( 'meta_key', 'ultimate-member' ),
+                    'description'   => __( 'Select the meta_key for User Profile Scrolling.', 'ultimate-member' )
                 );
 
-        $settings_structure['appearance']['sections']['']['fields'][] =
+        $settings_structure['appearance']['sections']['']['form_sections']['user_profile_scrolling']['fields'][] =
 
                 array(
                     'id'            => 'um_user_profile_scrolling_forms',
                     'type'          => 'text',
-                    'label'         => __( 'User Profile Scrolling - Form IDs', 'ultimate-member' ),
-                    'tooltip'       => __( 'Enter the Profile Form IDs comma separated for User Profile Scrolling.', 'ultimate-member' ),
+                    'label'         => __( 'Form IDs', 'ultimate-member' ),
+                    'description'   => __( 'Enter the Profile Form IDs comma separated for User Profile Scrolling.', 'ultimate-member' ),
                     'size'          => 'small',
                 );
 
-        $settings_structure['appearance']['sections']['']['fields'][] =
+        $settings_structure['appearance']['sections']['']['form_sections']['user_profile_scrolling']['fields'][] =
 
                 array(
                     'id'            => 'um_user_profile_scrolling_random',
                     'type'          => 'checkbox',
-                    'label'         => __( 'User Profile Scrolling - Random', 'ultimate-member' ),
+                    'label'         => __( 'Random', 'ultimate-member' ),
                     'default'       => 0,
-                    'tooltip'       => __( 'Click to add Random display of User Profiles.', 'ultimate-member' ),
+                    'description'   => __( 'Click to add Random display of User Profiles.', 'ultimate-member' ),
                 );
 
-        $settings_structure['appearance']['sections']['']['fields'][] =
+        $settings_structure['appearance']['sections']['']['form_sections']['user_profile_scrolling']['fields'][] =
 
                 array(
                     'id'            => 'um_user_profile_scrolling_page_bottom',
                     'type'          => 'checkbox',
-                    'label'         => __( 'User Profile Scrolling - Page bottom', 'ultimate-member' ),
+                    'label'         => __( 'Page bottom', 'ultimate-member' ),
                     'default'       => 0,
-                    'tooltip'       => __( 'Click to display buttons at the Profile page bottom.', 'ultimate-member' ),
+                    'description'   => __( 'Click to display buttons at the Profile page bottom.', 'ultimate-member' ),
                 );
 
         return $settings_structure;
