@@ -12,7 +12,7 @@ ID, user_login, display_name, first_name, last_name, user_nicename, user_email
 
 ## Updates
 1. Version 0.9.1 Removed buttons when Profile edit. Added option to display buttons at Page bottom.
-2. Version 1.0.0 Tested with UM 2.8.3
+2. Version 1.0.0 Updated for UM 2.8.3
 
 ## Translations or Text changes
 1. Use the "Say What?" plugin with text domain ultimate-member
