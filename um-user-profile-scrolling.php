@@ -1,16 +1,18 @@
 <?php
 /**
  * Plugin Name:     Ultimate Member - User Profile Scrolling
- * Description:     Extension to Ultimate Member for User Profile Scrolling via ID, username, display name, first or last name, user email or random.
- * Version:         1.0.0
+ * Description:     Extension to Ultimate Member for User Profile Scrolling via ID, username, display name, first or last name, user email or random for selected Profile forms.
+ * Version:         1.1.0
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
  * License URI:     https://www.gnu.org/licenses/gpl-2.0.html
  * Author URI:      https://github.com/MissVeronica
+ * Plugin URI:      https://github.com/MissVeronica/um-user-profile-scrolling
+ * Update URI:      https://github.com/MissVeronica/um-user-profile-scrolling
  * Text Domain:     ultimate-member
  * Domain Path:     /languages
- * UM version:      2.8.3
+ * UM version:      2.8.6
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; 
@@ -19,15 +21,16 @@ if ( ! class_exists( 'UM' ) ) return;
 Class UM_User_Profile_Scrolling {
 
     public $user_scroll_options = array();
-    public $search_key = '';
+    public $search_key          = '';
+    public $priority            = 9;
 
     function __construct() {
 
-        $priority = 9;
         if ( UM()->options()->get( 'um_user_profile_scrolling_page_bottom' ) == 1 ) {
-            $priority = 99;
+            $this->priority = 99;
         }
-        add_action( 'um_profile_content_main', array( $this, 'um_profile_content_main_user_scroll' ), $priority, 1 );
+
+        add_action( 'um_profile_content_main', array( $this, 'um_profile_content_main_user_scroll' ), $this->priority, 1 );
         add_filter( 'um_settings_structure',   array( $this, 'um_settings_structure_user_scroll' ), 10, 1 );
 
         $this->user_scroll_options =
@@ -110,7 +113,14 @@ Class UM_User_Profile_Scrolling {
 
         if ( ! um_is_on_edit_profile()) {
 
-            $um_user_profile_scrolling_forms = array_map( 'trim', array_map( 'sanitize_text_field', explode( ',', UM()->options()->get( 'um_user_profile_scrolling_forms' ))));
+            $um_user_profile_scrolling_forms = UM()->options()->get( 'um_user_profile_scrolling_forms' );
+
+            if ( is_array( $um_user_profile_scrolling_forms )) {
+                $um_user_profile_scrolling_forms = array_map( 'trim', array_map( 'sanitize_text_field', $um_user_profile_scrolling_forms ));
+
+            } else {
+                $um_user_profile_scrolling_forms = array_map( 'trim', array_map( 'sanitize_text_field', explode( ',', $um_user_profile_scrolling_forms )));
+            }
 
             if ( isset( $args['form_id'] ) && in_array( $args['form_id'], $um_user_profile_scrolling_forms )) {
 
@@ -130,7 +140,10 @@ Class UM_User_Profile_Scrolling {
                         $userids = $wpdb->get_results( "SELECT max( ID ) as max FROM $wpdb->users" );
                         do {
                             $random_id = absint( rand( 1, $userids[0]->max ));
-                        } while ( $this->um_can_view_profile_account_status( $random_id ) === false ); ?>
+
+                        } while ( $this->um_can_view_profile_account_status( $random_id ) === false );
+
+                        ?>
                         <button><a href="<?php echo esc_url( um_user_profile_url( $random_id ));?>"><?php echo __( 'Random User', 'ultimate-member' );?></a></button>
                         <?php
                     }
@@ -144,49 +157,96 @@ Class UM_User_Profile_Scrolling {
 
     public function um_settings_structure_user_scroll( $settings_structure ) {
 
-        $settings_structure['appearance']['sections']['']['form_sections']['user_profile_scrolling']['title'] = __( 'User Profile Scrolling', 'ultimate-member' );
-        $settings_structure['appearance']['sections']['']['form_sections']['user_profile_scrolling']['description'] = __( 'Plugin version 1.0.0 - tested with UM 2.8.3', 'ultimate-member' );
+        if ( isset( $_REQUEST['page'] ) && $_REQUEST['page'] == 'um_options' ) {
+            if ( isset( $_REQUEST['tab'] ) && $_REQUEST['tab'] == 'appearance' ) {
 
-        $settings_structure['appearance']['sections']['']['form_sections']['user_profile_scrolling']['fields'][] =
+                if ( ! isset( $settings_structure['appearance']['sections']['']['form_sections']['user_profile_scrolling']['fields'] )) {
 
-                array(
-                    'id'            => 'um_user_profile_scrolling_meta_key',
-                    'type'          => 'select',
-                    'size'          => 'small',
-                    'options'       => $this->user_scroll_options,
-                    'label'         => __( 'meta_key', 'ultimate-member' ),
-                    'description'   => __( 'Select the meta_key for User Profile Scrolling.', 'ultimate-member' )
-                );
+                    $plugin_data = get_plugin_data( __FILE__ );
 
-        $settings_structure['appearance']['sections']['']['form_sections']['user_profile_scrolling']['fields'][] =
+                    $link = sprintf( '<a href="%s" target="_blank" title="%s">%s</a>',
+                                                esc_url( $plugin_data['PluginURI'] ),
+                                                __( 'GitHub plugin documentation and download', 'ultimate-member' ),
+                                                __( 'Plugin', 'ultimate-member' )
+                                    );
 
-                array(
-                    'id'            => 'um_user_profile_scrolling_forms',
-                    'type'          => 'text',
-                    'label'         => __( 'Form IDs', 'ultimate-member' ),
-                    'description'   => __( 'Enter the Profile Form IDs comma separated for User Profile Scrolling.', 'ultimate-member' ),
-                    'size'          => 'small',
-                );
+                    $header = array(
+                                        'title'       => __( 'User Profile Scrolling', 'ultimate-member' ),
+                                        'description' => sprintf( __( '%s version %s - tested with UM 2.8.6', 'ultimate-member' ),
+                                                                            $link, esc_attr( $plugin_data['Version'] )),
+                                    );
 
-        $settings_structure['appearance']['sections']['']['form_sections']['user_profile_scrolling']['fields'][] =
+                    $um_profile_forms = get_posts( array(   'meta_key'    => '_um_mode',
+                                                            'meta_value'  => 'profile',
+                                                            'numberposts' => -1,
+                                                            'post_type'   => 'um_form',
+                                                            'post_status' => 'publish'
+                                                        ));
 
-                array(
-                    'id'            => 'um_user_profile_scrolling_random',
-                    'type'          => 'checkbox',
-                    'label'         => __( 'Random', 'ultimate-member' ),
-                    'default'       => 0,
-                    'description'   => __( 'Click to add Random display of User Profiles.', 'ultimate-member' ),
-                );
+                    $profile_forms = array();
+                    foreach( $um_profile_forms as $um_form ) {
+                        $profile_forms[$um_form->ID] = $um_form->post_title;
+                    }
 
-        $settings_structure['appearance']['sections']['']['form_sections']['user_profile_scrolling']['fields'][] =
+                    $um_user_profile_scrolling_forms = UM()->options()->get( 'um_user_profile_scrolling_forms' );
 
-                array(
-                    'id'            => 'um_user_profile_scrolling_page_bottom',
-                    'type'          => 'checkbox',
-                    'label'         => __( 'Page bottom', 'ultimate-member' ),
-                    'default'       => 0,
-                    'description'   => __( 'Click to display buttons at the Profile page bottom.', 'ultimate-member' ),
-                );
+                    $warning = '';
+                    if ( ! is_array( $um_user_profile_scrolling_forms )) {
+                        $warning = '<br />' . __( 'Save your Profile page selections after installation or update of the plugin', 'ultimate-member' );
+                    }
+
+                    $prefix = '&nbsp; * &nbsp;';
+
+                    $section_fields = array();
+
+                    $section_fields[] =
+
+                            array(
+                                'id'            => 'um_user_profile_scrolling_forms',
+                                'type'          => 'select',
+                                'multi'         => true,
+                                'size'          => 'medium',
+                                'options'       => $profile_forms,
+                                'label'         => $prefix . __( 'Profile Forms to include in scrolling', 'ultimate-member' ),
+                                'description'   => __( 'Select single or multiple Profile Forms for User Profile Scrolling.', 'ultimate-member' ) . $warning,
+                            );
+
+                    $section_fields[] =
+
+                            array(
+                                'id'            => 'um_user_profile_scrolling_meta_key',
+                                'type'          => 'select',
+                                'size'          => 'small',
+                                'options'       => $this->user_scroll_options,
+                                'label'         => $prefix . __( 'meta_key', 'ultimate-member' ),
+                                'description'   => __( 'Select the meta_key for User Profile Scrolling.', 'ultimate-member' )
+                            );
+
+                    $section_fields[] =
+
+                            array(
+                                'id'            => 'um_user_profile_scrolling_random',
+                                'type'          => 'checkbox',
+                                'label'         => $prefix . __( 'Random', 'ultimate-member' ),
+                                'default'       => 0,
+                                'description'   => __( 'Click to add Random display of User Profiles.', 'ultimate-member' ),
+                            );
+
+                    $section_fields[] =
+
+                            array(
+                                'id'            => 'um_user_profile_scrolling_page_bottom',
+                                'type'          => 'checkbox',
+                                'label'         => $prefix . __( 'Buttons at Page bottom', 'ultimate-member' ),
+                                'default'       => 0,
+                                'description'   => __( 'Click to display scrolling buttons at the Profile page bottom.', 'ultimate-member' ),
+                            );
+
+                    $settings_structure['appearance']['sections']['']['form_sections']['user_profile_scrolling'] = $header;
+                    $settings_structure['appearance']['sections']['']['form_sections']['user_profile_scrolling']['fields'] = $section_fields;
+                }
+            }
+        }
 
         return $settings_structure;
     }
