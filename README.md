@@ -20,4 +20,5 @@ ID, user_login, display_name, first_name, last_name, user_nicename, user_email
 2. https://wordpress.org/plugins/say-what/
 
 ## Installation & Updates
-1. Download the zip file and install as a WP Plugin, activate the plugin.
+1. Download the plugin ZIP file at the green Code button
+2. Upload and install with WP as a new WP Plugin, activate the plugin.
