@@ -18,6 +18,7 @@ ID, user_login, display_name, first_name, last_name, user_nicename, user_email
 2. Version 1.0.0 Updated for UM 2.8.3
 3. Version 1.1.0 Code improvements
 4. Version 1.2.0 Addition of User Roles to use Scrolling and User Roles to display in Scrolling and single or both selections of Previous/Next and Random Scrolling.
+5. Version 1.2.2 Update for WP 6.7.0 and UM 2.9.1
 
 ## Translations or Text changes
 1. Use the "Say What?" plugin with text domain ultimate-member
