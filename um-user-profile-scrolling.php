@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Ultimate Member - User Profile Scrolling
  * Description:     Extension to Ultimate Member for User Profile Scrolling via ID, username, display name, first or last name, user email or random for selected Profile forms.
- * Version:         1.2.0
+ * Version:         1.2.2
  * Requires PHP:    7.4
  * Author:          Miss Veronica
  * License:         GPL v2 or later
@@ -12,7 +12,7 @@
  * Update URI:      https://github.com/MissVeronica/um-user-profile-scrolling
  * Text Domain:     ultimate-member
  * Domain Path:     /languages
- * UM version:      2.8.6
+ * UM version:      2.9.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; 
@@ -39,19 +39,6 @@ Class UM_User_Profile_Scrolling {
         add_filter( 'um_settings_structure',   array( $this, 'um_settings_structure_user_scroll' ), 10, 1 );
 
         add_filter( 'plugin_action_links_' . Plugin_Basename_UPS, array( $this, 'scrolling_settings_link' ), 10 );
-
-        $this->user_scroll_options =
-
-                array(
-                    ''              => '',
-                    'ID'            => esc_html__( 'User ID', 'ultimate-member' ),
-                    'user_login'    => esc_html__( 'Username', 'ultimate-member' ),
-                    'display_name'  => esc_html__( 'User display name', 'ultimate-member' ),
-                    'first_name'    => esc_html__( 'User first name', 'ultimate-member' ),
-                    'last_name'     => esc_html__( 'User last name', 'ultimate-member' ),
-                    'user_nicename' => esc_html__( 'User nice name', 'ultimate-member' ),
-                    'user_email'    => esc_html__( 'User email', 'ultimate-member' ),
-                );
     }
 
     public function scrolling_settings_link( $links ) {
@@ -60,6 +47,23 @@ Class UM_User_Profile_Scrolling {
         $links[] = '<a href="' . esc_url( $url ) . '">' . esc_html__( 'Settings' ) . '</a>';
 
         return $links;
+    }
+
+    public function translate_text_options() {
+
+        if ( empty( $this->user_scroll_options )) {
+
+            $this->user_scroll_options =array(
+                                                ''              => '',
+                                                'ID'            => esc_html__( 'User ID', 'ultimate-member' ),
+                                                'user_login'    => esc_html__( 'Username', 'ultimate-member' ),
+                                                'display_name'  => esc_html__( 'User display name', 'ultimate-member' ),
+                                                'first_name'    => esc_html__( 'User first name', 'ultimate-member' ),
+                                                'last_name'     => esc_html__( 'User last name', 'ultimate-member' ),
+                                                'user_nicename' => esc_html__( 'User nice name', 'ultimate-member' ),
+                                                'user_email'    => esc_html__( 'User email', 'ultimate-member' ),
+                                            );
+        }
     }
 
     public function um_can_view_profile_account_status( $user_id ) {
@@ -91,6 +95,7 @@ Class UM_User_Profile_Scrolling {
 
         $scroll_users = array( 'left' => array(), 'right' => array() );
 
+        $this->translate_text_options();
         $this->search_key = sanitize_text_field( UM()->options()->get( 'um_user_profile_scrolling_meta_key' ));
         if ( ! empty( $this->search_key ) && array_key_exists( $this->search_key, $this->user_scroll_options )) {
 
@@ -115,6 +120,7 @@ Class UM_User_Profile_Scrolling {
 
     public function display_button( $scroll_users, $button_text ) {
 
+        $this->translate_text_options();
         $button_text = sprintf( $button_text, $this->user_scroll_options[$this->search_key] );
 
         foreach( $scroll_users as $user ) {
@@ -213,7 +219,7 @@ Class UM_User_Profile_Scrolling {
 
                     $header = array(
                                         'title'       => esc_html__( 'User Profile Scrolling', 'ultimate-member' ),
-                                        'description' => sprintf( esc_html__( '%s version %s - tested with UM 2.8.6', 'ultimate-member' ),
+                                        'description' => sprintf( esc_html__( '%s version %s - tested with UM 2.9.1', 'ultimate-member' ),
                                                                             $link, esc_attr( $plugin_data['Version'] )),
                                     );
 
@@ -237,6 +243,7 @@ Class UM_User_Profile_Scrolling {
                         $warning = '<br />' . esc_html__( 'Save your Profile page selections after installation or update of the plugin', 'ultimate-member' );
                     }
 
+                    $this->translate_text_options();
                     $prefix = '&nbsp; * &nbsp;';
                     $section_fields = array();
 
@@ -324,3 +331,4 @@ Class UM_User_Profile_Scrolling {
 }
 
 new UM_User_Profile_Scrolling();
+
